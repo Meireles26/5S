@@ -365,7 +365,7 @@ function vSemSetor(){
   if(!S.setores.length){
     return `<div class="box"><h3>Nenhum setor cadastrado ainda</h3>
       <p>${S.isAdmin?"Cadastre os setores e suas categorias para começar.":"Peça ao Setor de Qualidade para cadastrar os setores."}</p>
-      ${S.isAdmin?`<button class="btn yellow big" data-a="go" data-v="admin">Cadastrar setores</button>`:""}</div>`;
+      ${S.isAdmin?`<button class="btn yellow big" data-a="go" data-v="admin">Cadastrar setores</button>`:""}</div>${linkQualidade()}`;
   }
   return `${S.isAdmin?`<button class="act main" style="width:100%;margin-top:18px" data-a="go" data-v="admin"><span class="ibub">${I("shield")}</span><div><b>Painel da Qualidade</b><br><span>Validar, lançar notas, setores e configurações</span></div><span class="go">${I("chev")}</span></button>
      <p class="meta" style="margin:12px 2px 0">Ou escolha um setor abaixo para ver o app como a equipe vê.</p>`:""}<h2 class="q" style="margin-top:20px">Qual é o seu setor?</h2>
@@ -373,7 +373,15 @@ function vSemSetor(){
    ${CATS.map(([k,l])=>{
      const ss=S.setores.filter(s=>s.categoria===k); if(!ss.length) return "";
      return `<div class="grouplbl">${l}</div>`+ss.map(s=>`<button class="item" data-a="setor" data-id="${s.id}"><b>${esc(s.nome)}</b></button>`).join("");
-   }).join("")}`;
+   }).join("")}${linkQualidade()}`;
+}
+function linkQualidade(){
+  if(S.isAdmin||!window.__HOST_AUTH) return "";
+  return `<button class="btn" style="width:100%;margin-top:18px" data-a="go" data-v="entrar">${I("shield")} Sou do Setor de Qualidade: entrar</button>`;
+}
+function vEntrar(){
+  if(S.isAdmin) return vAdmin();
+  return back("home")+`<h2 class="q">Acesso da Qualidade</h2>`+(typeof hostLoginBox==="function"?hostLoginBox():"");
 }
 const ICONS={
  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
@@ -986,7 +994,7 @@ function render(){
   const needSetor=["home","nc1","nc2","nc3","resolver","resForm","boa","historico","avisos"].includes(S.view);
   let html;
   if(needSetor && !setor(S.setorId)) html=vSemSetor();
-  else html=({home:vHome,nc1:vNc1,nc2:vNc2,nc3:vNc3,ok:vOk,resolver:vResolver,resForm:vResForm,boa:vBoa,historico:vHistorico,det:vDetalhe,placar:vPlacar,regras:vRegras,admin:vAdmin,admValidar:vAdmValidar,admNotas:vAdmNotas,admNota:vAdmNota,admSetores:vAdmSetores,admSetor:vAdmSetor,admConfig:vAdmConfig,admResultados:vAdmResultados,avisos:vAvisos}[S.view]||vHome)();
+  else html=({home:vHome,nc1:vNc1,nc2:vNc2,nc3:vNc3,ok:vOk,resolver:vResolver,resForm:vResForm,boa:vBoa,historico:vHistorico,det:vDetalhe,placar:vPlacar,regras:vRegras,admin:vAdmin,admValidar:vAdmValidar,admNotas:vAdmNotas,admNota:vAdmNota,admSetores:vAdmSetores,admSetor:vAdmSetor,admConfig:vAdmConfig,admResultados:vAdmResultados,entrar:vEntrar,avisos:vAvisos}[S.view]||vHome)();
   $app.innerHTML=html;
   const nav=document.getElementById("nav");
   const showNav=!["nc1","nc2","nc3","resForm","boa","ok","admNota","admSetor","admConfig"].includes(S.view) && !!setor(S.setorId);
